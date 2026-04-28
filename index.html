@@ -778,7 +778,7 @@
         const dy = event.clientY - renderer.lastY;
         const speed = Math.hypot(dx, dy);
         renderer.dragYaw += dx * 0.012;
-        renderer.dragPitch = Math.max(-0.85, Math.min(0.85, renderer.dragPitch + dy * 0.01));
+        renderer.dragPitch = Math.max(-0.85, Math.min(0.85, renderer.dragPitch - dy * 0.01));
         if (speed > 10) {
           renderer.glitch = Math.min(1, renderer.glitch + (speed - 10) / 150);
           renderer.glitchSeed += speed * 0.17;
@@ -1041,12 +1041,17 @@
           const nearCursor =
             renderer.hover &&
             Math.hypot(col - renderer.hoverCol, row - renderer.hoverRow) <= hoverRadius;
-          const rippleHit = renderer.ripples.some((ripple) => {
+          const rippleStrength = renderer.ripples.reduce((strongest, ripple) => {
             const age = now - ripple.start;
-            const wave = (age / 720) * 25;
+            const progress = age / 720;
+            const wave = progress * 25;
             const distance = Math.hypot(col - ripple.col, row - ripple.row);
-            return Math.abs(distance - wave) <= 1.4;
-          });
+            const band = Math.max(0, 1 - Math.abs(distance - wave) / 1.6);
+            const decay = 1 - progress;
+            const flicker = 0.72 + Math.sin(row * 2.9 + col * 4.1 + ripple.start * 0.03) * 0.28;
+            return Math.max(strongest, band * decay * flicker);
+          }, 0);
+          const rippleHit = rippleStrength > 0.18;
           const rainbowClasses = ["hot", "yellow", "lime", "cyan", "violet", "pink"];
           const rainbowClass = rainbowClasses[Math.abs((row + col) % rainbowClasses.length)];
           const glitchHit =
@@ -1056,7 +1061,7 @@
 
           grid[row][col] = {
             depth: z2,
-            char: glitchHit ? ["#", "%", "&", "=", "+"][Math.abs((row + col) % 5)] : rippleHit ? "*" : nearCursor ? "\u25A0" : point.char,
+            char: glitchHit ? ["#", "%", "&", "=", "+"][Math.abs((row + col) % 5)] : rippleHit ? (rippleStrength > 0.38 ? "*" : ".") : nearCursor ? "\u25A0" : point.char,
             className: glitchHit ? glitchClass : rippleHit ? rainbowClass : point.className
           };
         }
