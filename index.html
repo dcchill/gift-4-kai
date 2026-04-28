@@ -326,6 +326,22 @@
       z-index: 4;
     }
 
+    .heart-pop {
+      position: fixed;
+      left: var(--hx);
+      top: var(--hy);
+      color: var(--red);
+      font-size: var(--hs);
+      line-height: 1;
+      pointer-events: none;
+      text-shadow:
+        0 0 0.55rem var(--red),
+        0 0 1rem var(--hot);
+      transform: translate(-50%, -50%);
+      animation: heartPop 1200ms steps(12) forwards;
+      z-index: 10;
+    }
+
     .controls {
       position: fixed;
       left: 1rem;
@@ -351,7 +367,7 @@
     }
 
     .cli-log {
-      height: 6.6rem;
+      height: 8.2rem;
       padding: 0.65rem 0.75rem 0.25rem;
       overflow: hidden;
       color: var(--lime);
@@ -364,6 +380,10 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+
+    .cli-line.help {
+      white-space: normal;
     }
 
     .cli-line.reply {
@@ -447,6 +467,22 @@
         width: 13rem;
         height: 13rem;
         filter: hue-rotate(260deg);
+      }
+    }
+
+    @keyframes heartPop {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.55) rotate(-8deg);
+      }
+
+      18% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+        transform: translate(calc(-50% + var(--hdx)), calc(-50% - var(--hdy))) scale(1.25) rotate(var(--hr));
       }
     }
 
@@ -666,6 +702,22 @@
       </div>
     </section>
     </section>
+
+    <section class="view" id="miataView" aria-label="Rotating ANSI hologram pink Miata" hidden>
+    <section class="window hologram">
+      <div class="bar">
+        <span>PINK_MIATA.EXE</span>
+        <span><i></i><i></i><i></i></span>
+      </div>
+      <div class="stage" data-run="C:\GARAGE\MIATA.EXE" data-code="SCAN: MIAT // ANSI HOLOGRAM">
+        <div class="art3d miata3d ascii-rendered" data-model="miata" aria-hidden="true">
+          <div class="plane">
+            <pre class="ascii-output"><span class="pink">        PINK MIATA MODEL LOADING       </span></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+    </section>
   </main>
 
   <section class="cli" aria-label="Cute terminal message CLI">
@@ -689,6 +741,7 @@
     const flowerView = document.querySelector("#flowerView");
     const kittyView = document.querySelector("#kittyView");
     const ladybugView = document.querySelector("#ladybugView");
+    const miataView = document.querySelector("#miataView");
     const screenTitle = document.querySelector("#screenTitle");
     const screenCopy = document.querySelector("#screenCopy");
     const viewToggle = document.querySelector("#viewToggle");
@@ -715,23 +768,26 @@
       },
       ladybug: {
         node: ladybugView,
-        next: "flower",
-        button: "FLOWER",
+        next: "miata",
+        button: "MIATA",
         title: "Cutie<br>Ladybug",
         copy: "A ladybug for my ladybug! :3"
+      },
+      miata: {
+        node: miataView,
+        next: "flower",
+        button: "FLOWER",
+        title: "Pink<br>Miata",
+        copy: "Cute pink Miata!!"
       }
     };
     const cuteReplies = [
-      "sending you a pocket-sized sparkle packet.",
       "your message grew a tiny flower in the terminal.",
-      "beep boop: affection successfully compiled.",
-      "a little pixel heart is orbiting you now.",
-      "the garden accepts this transmission.",
-      "soft signal received. storing it next to the stars.",
-      "you unlocked one bonus glimmer.",
+      "<3",
       "message wrapped in a bow and delivered.",
-      "tiny hologram says: you are very cherished.",
-      "ladybug protocol says good luck is inbound."
+      "command not found: cuteness overload",
+      "system error: too much love.",
+      "the system is now purring with happiness.",
     ];
     const RENDER_WIDTH = 64;
     const RENDER_HEIGHT = 40;
@@ -889,6 +945,16 @@
       }
     }
 
+    function addBox(points, x1, x2, y1, y2, z1, z2, className, char) {
+      for (let y = y1; y <= y2; y += 1) {
+        for (let x = x1; x <= x2; x += 1) {
+          for (let z = z1; z <= z2; z += 1) {
+            addPoint(points, x, y, z, className, char);
+          }
+        }
+      }
+    }
+
     function buildModel(type) {
       if (type === "kitty") {
         return buildKittyModel();
@@ -896,6 +962,10 @@
 
       if (type === "ladybug") {
         return buildLadybugModel();
+      }
+
+      if (type === "miata") {
+        return buildMiataModel();
       }
 
       return buildFlowerModel();
@@ -981,6 +1051,32 @@
         addLine(points, side * 13, 13, 1, side * 23, 19, 1, "black", "-");
       }
 
+      return points;
+    }
+
+    function buildMiataModel() {
+      const points = [];
+      addBox(points, -24, 24, 1, 8, -11, 11, "pink", "@");
+      addBox(points, -20, 17, -2, 2, -9, 9, "soft", "#");
+      addBox(points, -4, 10, -11, 0, -7, 7, "cyan", "=");
+      addBox(points, 8, 15, -7, 0, -7, 7, "pink", "+");
+      addLine(points, -10, -4, 11, 16, -4, 11, "white", "_");
+      addLine(points, -10, -4, -11, 16, -4, -11, "white", "_");
+
+      for (const z of [-12, 12]) {
+        addEllipsoid(points, -15, 9, z, 5, 5, 2, "black", "0");
+        addEllipsoid(points, 14, 9, z, 5, 5, 2, "black", "0");
+        addEllipsoid(points, -15, 9, z, 2, 2, 3, "cyan", "*");
+        addEllipsoid(points, 14, 9, z, 2, 2, 3, "cyan", "*");
+      }
+
+      addEllipsoid(points, -23, 0, -7, 2, 2, 1, "yellow", "o");
+      addEllipsoid(points, -23, 0, 7, 2, 2, 1, "yellow", "o");
+      addEllipsoid(points, -14, -5, -7, 2, 2, 1, "yellow", "^");
+      addEllipsoid(points, -14, -5, 7, 2, 2, 1, "yellow", "^");
+      addEllipsoid(points, 24, 2, -9, 1, 2, 1, "red", "!");
+      addEllipsoid(points, 24, 2, 9, 1, 2, 1, "red", "!");
+      addLine(points, -21, 7, 0, 21, 7, 0, "hot", "-");
       return points;
     }
 
@@ -1110,15 +1206,145 @@
 
     animateAscii();
 
+    function setView(name) {
+      currentView = name;
+
+      for (const view of Object.values(views)) {
+        view.node.hidden = true;
+      }
+
+      const active = views[currentView];
+      active.node.hidden = false;
+      viewToggle.textContent = active.button;
+      screenTitle.innerHTML = active.title;
+      screenCopy.textContent = active.copy;
+    }
+
+    function getActiveRenderer() {
+      return renderers.find((renderer) => renderer.art.closest(".view") === views[currentView].node);
+    }
+
+    function addModelRipple(renderer, col, row, stagger = 0) {
+      renderer.ripples.push({
+        col,
+        row,
+        start: performance.now() + stagger
+      });
+    }
+
+    function sparkleActiveModel(amount = 0.55) {
+      const renderer = getActiveRenderer();
+      if (!renderer) {
+        return;
+      }
+
+      addModelRipple(renderer, RENDER_WIDTH / 2, RENDER_HEIGHT / 2);
+      addModelRipple(renderer, RENDER_WIDTH / 2 - 10, RENDER_HEIGHT / 2 + 3, 90);
+      addModelRipple(renderer, RENDER_WIDTH / 2 + 10, RENDER_HEIGHT / 2 - 3, 180);
+      renderer.glitch = Math.min(1, renderer.glitch + amount);
+      renderer.glitchSeed += 9;
+    }
+
+    function pulseFast(duration) {
+      const wasFast = document.body.classList.contains("fast");
+      document.body.classList.add("fast");
+      window.setTimeout(() => {
+        if (!wasFast) {
+          document.body.classList.remove("fast");
+        }
+      }, duration);
+    }
+
+    function popHearts(count = 9) {
+      const activeStage = views[currentView].node.querySelector(".stage");
+      const rect = activeStage.getBoundingClientRect();
+      const originX = rect.left + rect.width / 2;
+      const originY = rect.top + rect.height / 2;
+
+      for (let i = 0; i < count; i += 1) {
+        const heart = document.createElement("span");
+        const angle = (-130 + (260 / Math.max(1, count - 1)) * i) * (Math.PI / 180);
+        const drift = 55 + (i % 3) * 28;
+        heart.className = "heart-pop";
+        heart.textContent = "<3";
+        heart.style.setProperty("--hx", `${originX + Math.cos(angle) * 18}px`);
+        heart.style.setProperty("--hy", `${originY + Math.sin(angle) * 10}px`);
+        heart.style.setProperty("--hdx", `${Math.cos(angle) * drift}px`);
+        heart.style.setProperty("--hdy", `${80 + Math.abs(Math.sin(angle)) * 55}px`);
+        heart.style.setProperty("--hr", `${-24 + i * 6}deg`);
+        heart.style.setProperty("--hs", `${1.15 + (i % 4) * 0.22}rem`);
+        heart.style.animationDelay = `${i * 45}ms`;
+        document.body.appendChild(heart);
+        heart.addEventListener("animationend", () => heart.remove());
+      }
+    }
+
     function addCliLine(text, className = "") {
       const line = document.createElement("div");
       line.className = `cli-line ${className}`.trim();
       line.textContent = text;
       cliLog.appendChild(line);
 
-      while (cliLog.children.length > 5) {
+      while (cliLog.children.length > 7) {
         cliLog.removeChild(cliLog.firstElementChild);
       }
+    }
+
+    function addHelpLines() {
+      addCliLine("SYSTEM: commands:", "reply help");
+      addCliLine("SYSTEM: pages: flower, kitty/cat, bug/ladybug, miata/car", "reply help");
+      addCliLine("SYSTEM: love: ily, i love you, love u, luv u", "reply help");
+      addCliLine("SYSTEM: extras: mario kart/mk/mk8, pdq, nala", "reply help");
+      addCliLine("SYSTEM: more: marriage/marry me, diet coke, bunny, bear", "reply help");
+    }
+
+    function runMessageEffect(message) {
+      const lower = message.toLowerCase();
+      let handled = false;
+
+      if (lower.includes("kitty") || lower.includes("cat")) {
+        setView("kitty");
+        sparkleActiveModel(0.42);
+        handled = true;
+      }
+
+      if (lower.includes("bug") || lower.includes("ladybug")) {
+        setView("ladybug");
+        sparkleActiveModel(0.42);
+        handled = true;
+      }
+
+      if (lower.includes("miata") || lower.includes("car")) {
+        setView("miata");
+        sparkleActiveModel(0.42);
+        handled = true;
+      }
+
+      if (lower.includes("flower")) {
+        setView("flower");
+        sparkleActiveModel(0.42);
+        handled = true;
+      }
+
+      if (lower.includes("i love you") || lower.includes("love u") || lower.includes("luv u") || lower.includes("ily")) {
+        sparkleActiveModel(0.9);
+        pulseFast(1400);
+        popHearts();
+        handled = true;
+      }
+
+      if (lower.includes("mario kart") || lower.includes("mariokart") || lower.includes("mk") || lower.includes("mk8")) {
+        pulseFast(2200);
+        sparkleActiveModel(0.55);
+        handled = true;
+      }
+
+      if (lower.includes("pdq") || lower.includes("nala") || lower.includes("marriage") || lower.includes("marry me") || lower.includes("diet coke") || lower.includes("bunny") || lower.includes("bear")) {
+        sparkleActiveModel(0.55);
+        handled = true;
+      }
+
+      return handled;
     }
 
     function getCuteReply(message) {
@@ -1150,6 +1376,18 @@
       if (lower.includes("i love you") || lower.includes("love u") || lower.includes("luv u") || lower.includes("ily")) {
         return "I love you too! <3";
       }
+      if (lower.includes("pdq")) {
+        return "Lets get some chicken! :3";
+      }
+      if (lower.includes("nala")) {
+        return "Ur lizard daughter misses u!";
+      }
+      if (lower.includes("marriage") || lower.includes("marry me")) {
+        return "Soon my love! <3";
+      }
+     if (lower.includes("diet coke")) {
+        return "Mmmmm yum, ur favorite!";
+      }
 
       let hash = 0;
       for (const char of message) {
@@ -1170,22 +1408,19 @@
       }
 
       addCliLine(`KAI> ${message}`);
+      if (message.toLowerCase().includes("help")) {
+        addHelpLines();
+        cliInput.value = "";
+        return;
+      }
+
       addCliLine(`SYSTEM: ${getCuteReply(message)}`, "reply");
+      runMessageEffect(message);
       cliInput.value = "";
     });
 
     viewToggle.addEventListener("click", () => {
-      currentView = views[currentView].next;
-
-      for (const view of Object.values(views)) {
-        view.node.hidden = true;
-      }
-
-      const active = views[currentView];
-      active.node.hidden = false;
-      viewToggle.textContent = active.button;
-      screenTitle.innerHTML = active.title;
-      screenCopy.textContent = active.copy;
+      setView(views[currentView].next);
     });
 
     pauseButton.addEventListener("click", () => {
