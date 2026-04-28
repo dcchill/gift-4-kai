@@ -1,0 +1,1196 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ANSI Pixel Flower</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #05020a;
+      --ink: #fff5ff;
+      --hot: #ff3fbc;
+      --pink: #ff8ae2;
+      --soft: #ffc7f1;
+      --cyan: #42f8ff;
+      --lime: #77ff6a;
+      --green: #1fd15d;
+      --yellow: #ffe66d;
+      --red: #ff2348;
+      --violet: #8b5cff;
+      --cell: clamp(0.58rem, 1.08vw, 0.9rem);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Lucida Console", "Courier New", Consolas, monospace;
+    }
+
+    body {
+      min-height: 100vh;
+      overflow: hidden;
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        radial-gradient(circle at 22% 18%, rgba(255, 63, 188, 0.38), transparent 18rem),
+        radial-gradient(circle at 82% 70%, rgba(66, 248, 255, 0.22), transparent 22rem),
+        linear-gradient(135deg, #05020a 0%, #12031e 45%, #030b14 100%);
+      background-size: 18px 18px, 18px 18px, auto, auto, auto;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.08) 0,
+        rgba(255, 255, 255, 0.08) 1px,
+        transparent 1px,
+        transparent 4px
+      );
+      mix-blend-mode: overlay;
+      opacity: 0.35;
+      z-index: 5;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      box-shadow: inset 0 0 8rem rgba(0, 0, 0, 0.85);
+      z-index: 6;
+    }
+
+    main {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(17rem, 0.42fr) minmax(20rem, 1fr);
+      align-items: center;
+      gap: clamp(1rem, 4vw, 4rem);
+      padding: clamp(1rem, 4vw, 3.5rem);
+      position: relative;
+      z-index: 1;
+    }
+
+    .title {
+      max-width: 31rem;
+      text-shadow:
+        2px 0 var(--hot),
+        -2px 0 var(--cyan),
+        0 0 1rem rgba(255, 63, 188, 0.55);
+    }
+
+    .badge {
+      display: inline-block;
+      margin-bottom: 1rem;
+      padding: 0.35rem 0.55rem;
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+      background: rgba(66, 248, 255, 0.08);
+      box-shadow: 0 0 1rem rgba(66, 248, 255, 0.3);
+      font-size: 0.82rem;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.1rem, 6.8vw, 5.6rem);
+      line-height: 0.92;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    p {
+      margin: 1rem 0 0;
+      max-width: 27rem;
+      color: #ffc7f1;
+      font-size: clamp(0.95rem, 1.6vw, 1.1rem);
+      line-height: 1.55;
+    }
+
+    .window {
+      border: 2px solid var(--soft);
+      background:
+        linear-gradient(90deg, rgba(255, 63, 188, 0.2), rgba(66, 248, 255, 0.16)),
+        rgba(5, 2, 10, 0.74);
+      box-shadow:
+        0 0 0 3px #05020a,
+        0 0 2.2rem rgba(255, 63, 188, 0.42),
+        0 0 4rem rgba(66, 248, 255, 0.16);
+      min-height: min(74vh, 43rem);
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    .bar {
+      height: 2.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0 0.7rem;
+      border-bottom: 2px solid var(--soft);
+      color: #05020a;
+      background: linear-gradient(90deg, var(--soft), var(--cyan));
+      font-size: 0.85rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .bar span:last-child {
+      display: flex;
+      gap: 0.25rem;
+    }
+
+    .bar i {
+      width: 0.75rem;
+      height: 0.75rem;
+      display: block;
+      border: 1px solid #05020a;
+      background: #05020a;
+    }
+
+    .stage {
+      position: relative;
+      min-height: 28rem;
+      display: grid;
+      place-items: center;
+      perspective: 900px;
+      overflow: hidden;
+    }
+
+    .view {
+      display: contents;
+    }
+
+    .view[hidden] {
+      display: none;
+    }
+
+    .stage::before {
+      content: attr(data-run);
+      position: absolute;
+      left: 0.85rem;
+      top: 0.75rem;
+      color: var(--lime);
+      font-size: 0.85rem;
+      text-shadow: 0 0 0.7rem var(--lime);
+    }
+
+    .stage::after {
+      content: attr(data-code);
+      position: absolute;
+      right: 0.85rem;
+      bottom: 0.75rem;
+      color: rgba(66, 248, 255, 0.8);
+      font-size: 0.78rem;
+    }
+
+    .art3d {
+      position: relative;
+      width: min(84vw, 43rem);
+      height: min(84vw, 43rem);
+      max-height: 43rem;
+      transform-style: preserve-3d;
+      animation: spin 7.5s linear infinite;
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .art3d.dragging {
+      cursor: grabbing;
+    }
+
+    .art3d.ascii-rendered {
+      animation: none;
+      transform-style: flat;
+    }
+
+    .art3d.ascii-rendered .plane {
+      transform: none;
+      opacity: 1;
+    }
+
+    .art3d.ascii-rendered .plane:not(:first-child) {
+      display: none;
+    }
+
+    .kitty3d {
+      animation-duration: 8.8s;
+    }
+
+    .plane {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      transform-style: preserve-3d;
+      filter: drop-shadow(0 0 0.75rem rgba(255, 63, 188, 0.5));
+    }
+
+    .plane:nth-child(1) { transform: translateZ(0); opacity: 1; }
+    .plane:nth-child(2) { transform: rotateY(90deg) translateZ(0); opacity: 0.86; }
+    .plane:nth-child(3) { transform: rotateY(45deg) translateZ(-0.5rem); opacity: 0.55; }
+    .plane:nth-child(4) { transform: rotateY(-45deg) translateZ(-0.5rem); opacity: 0.55; }
+
+    .ascii-output {
+      min-width: 64ch;
+      min-height: 40em;
+      text-align: left;
+    }
+
+    pre {
+      margin: 0;
+      font-size: var(--cell);
+      line-height: 0.92;
+      letter-spacing: 0;
+      font-weight: 700;
+      user-select: none;
+      -webkit-user-select: none;
+      transform: translateZ(1px);
+    }
+
+    .art3d pre span {
+      transition: color 120ms steps(2), text-shadow 120ms steps(2), filter 120ms steps(2);
+    }
+
+    .art3d.squares pre span {
+      filter: saturate(1.35) brightness(1.14);
+      text-shadow:
+        0 0 0.4rem currentColor,
+        0 0 0.9rem currentColor;
+    }
+
+    .art3d.glitching pre {
+      animation: textGlitch 120ms steps(2) infinite;
+    }
+
+    .pink { color: var(--pink); text-shadow: 0 0 0.6rem var(--hot); }
+    .soft { color: var(--soft); text-shadow: 0 0 0.6rem var(--pink); }
+    .hot { color: var(--hot); text-shadow: 0 0 0.8rem var(--hot); }
+    .red { color: var(--red); text-shadow: 0 0 0.8rem var(--red); }
+    .yellow { color: var(--yellow); text-shadow: 0 0 0.7rem var(--yellow); }
+    .green { color: var(--green); text-shadow: 0 0 0.7rem var(--green); }
+    .lime { color: var(--lime); text-shadow: 0 0 0.7rem var(--lime); }
+    .cyan { color: var(--cyan); text-shadow: 0 0 0.7rem var(--cyan); }
+    .violet { color: var(--violet); text-shadow: 0 0 0.8rem var(--violet); }
+    .white { color: var(--ink); text-shadow: 0 0 0.8rem rgba(255, 255, 255, 0.7); }
+    .black { color: #05020a; text-shadow: 0 0 0.55rem var(--cyan); }
+
+    .hologram {
+      border-color: var(--cyan);
+      box-shadow:
+        0 0 0 3px #05020a,
+        0 0 2.4rem rgba(66, 248, 255, 0.48),
+        0 0 4.5rem rgba(139, 92, 255, 0.25);
+    }
+
+    .hologram .bar {
+      background: linear-gradient(90deg, var(--cyan), var(--soft), var(--violet));
+    }
+
+    .hologram .plane {
+      filter:
+        drop-shadow(0 0 0.65rem rgba(66, 248, 255, 0.65))
+        drop-shadow(0 0 1.2rem rgba(255, 63, 188, 0.26));
+    }
+
+    .ripple {
+      position: absolute;
+      left: var(--rx);
+      top: var(--ry);
+      width: 1rem;
+      height: 1rem;
+      border: 2px solid var(--cyan);
+      border-color: var(--cyan) var(--hot) var(--yellow) var(--lime);
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      box-shadow:
+        0 0 0.7rem var(--cyan),
+        0 0 1.2rem var(--hot),
+        inset 0 0 0.5rem var(--yellow);
+      animation: ripple 650ms steps(7) forwards;
+      z-index: 4;
+    }
+
+    .controls {
+      position: fixed;
+      left: 1rem;
+      right: 1rem;
+      bottom: 1rem;
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      z-index: 8;
+    }
+
+    .cli {
+      position: fixed;
+      left: 1rem;
+      bottom: 1rem;
+      width: min(34rem, calc(100vw - 2rem));
+      border: 2px solid var(--lime);
+      background: rgba(5, 2, 10, 0.86);
+      box-shadow:
+        3px 3px 0 var(--hot),
+        0 0 1.3rem rgba(119, 255, 106, 0.24);
+      z-index: 9;
+    }
+
+    .cli-log {
+      height: 6.6rem;
+      padding: 0.65rem 0.75rem 0.25rem;
+      overflow: hidden;
+      color: var(--lime);
+      font-size: 0.82rem;
+      line-height: 1.35;
+      text-shadow: 0 0 0.55rem var(--lime);
+    }
+
+    .cli-line {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .cli-line.reply {
+      color: var(--soft);
+      text-shadow: 0 0 0.55rem var(--hot);
+    }
+
+    .cli-form {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.45rem;
+      border-top: 1px solid rgba(119, 255, 106, 0.45);
+    }
+
+    .cli-prompt {
+      color: var(--cyan);
+      font-weight: 700;
+      text-shadow: 0 0 0.6rem var(--cyan);
+    }
+
+    .cli input {
+      width: 100%;
+      min-width: 0;
+      border: 0;
+      outline: 0;
+      color: var(--ink);
+      background: transparent;
+      font: 700 0.9rem "Lucida Console", "Courier New", monospace;
+    }
+
+    .cli input::placeholder {
+      color: rgba(255, 199, 241, 0.58);
+    }
+
+    button {
+      height: 2.4rem;
+      min-width: 2.7rem;
+      border: 2px solid var(--cyan);
+      border-radius: 0;
+      color: var(--cyan);
+      background: #05020a;
+      box-shadow: 3px 3px 0 var(--hot);
+      font: 700 0.9rem "Lucida Console", "Courier New", monospace;
+      cursor: pointer;
+    }
+
+    button:hover {
+      color: #05020a;
+      background: var(--cyan);
+    }
+
+    body.paused .art3d {
+      animation-play-state: paused;
+    }
+
+    body.fast .art3d {
+      animation-duration: 3.2s;
+    }
+
+    @keyframes spin {
+      from {
+        transform: rotateX(8deg) rotateY(0deg) rotateZ(-1deg);
+      }
+
+      to {
+        transform: rotateX(8deg) rotateY(360deg) rotateZ(-1deg);
+      }
+    }
+
+    @keyframes ripple {
+      0% {
+        opacity: 0.95;
+        width: 0.8rem;
+        height: 0.8rem;
+      }
+
+      100% {
+        opacity: 0;
+        width: 13rem;
+        height: 13rem;
+        filter: hue-rotate(260deg);
+      }
+    }
+
+    @keyframes textGlitch {
+      0% {
+        transform: translateZ(1px);
+        filter: hue-rotate(0deg) saturate(1.1);
+      }
+
+      50% {
+        transform: translate3d(0.18rem, -0.08rem, 1px);
+        filter: hue-rotate(80deg) saturate(1.75);
+      }
+
+      100% {
+        transform: translate3d(-0.12rem, 0.06rem, 1px);
+        filter: hue-rotate(180deg) saturate(1.4);
+      }
+    }
+
+    @media (max-width: 760px) {
+      body {
+        overflow: auto;
+      }
+
+      main {
+        grid-template-columns: 1fr;
+        align-content: start;
+        padding-bottom: 13rem;
+      }
+
+      .window {
+        min-height: 27rem;
+      }
+
+      .stage {
+        min-height: 25rem;
+      }
+
+      .cli {
+        right: 1rem;
+        bottom: 4.4rem;
+      }
+
+      .cli-log {
+        height: 5.4rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="title" aria-label="Title">
+      <span class="badge">ANSI_3d</span>
+      <h1 id="screenTitle">Pixel<br>Flower</h1>
+      <p id="screenCopy">Pretty pink flower for my honey :3</p>
+    </section>
+
+    <section class="view" id="flowerView" aria-label="Rotating ANSI pixel flower animation">
+    <section class="window">
+      <div class="bar">
+        <span>FLOWER_VIEWER.EXE</span>
+        <span><i></i><i></i><i></i></span>
+      </div>
+      <div class="stage" data-run="C:\FLOWER\RUN.EXE" data-code="01001101 00110010 01001011  4KAI">
+        <div class="art3d flower3d ascii-rendered" data-model="flower" aria-hidden="true">
+          <div class="plane">
+            <pre class="ascii-output"><span class="hot">         @@@         </span>
+<span class="pink">      @@</span><span class="soft">@@@@@</span><span class="pink">@@      </span>
+<span class="hot">    @@@</span><span class="soft">@@@@@@@</span><span class="hot">@@@    </span>
+<span class="pink">  @@@</span><span class="soft">@@@@</span><span class="yellow">#####</span><span class="soft">@@@@</span><span class="pink">@@@  </span>
+<span class="soft"> @@</span><span class="pink">@@@@@</span><span class="yellow">#######</span><span class="pink">@@@@@</span><span class="soft">@@ </span>
+<span class="hot">@@</span><span class="pink">@@@@@</span><span class="yellow">#########</span><span class="pink">@@@@@</span><span class="hot">@@</span>
+<span class="soft"> @@</span><span class="pink">@@@@@</span><span class="yellow">#######</span><span class="pink">@@@@@</span><span class="soft">@@ </span>
+<span class="pink">  @@@</span><span class="soft">@@@@</span><span class="yellow">#####</span><span class="soft">@@@@</span><span class="pink">@@@  </span>
+<span class="hot">    @@@</span><span class="soft">@@@@@@@</span><span class="hot">@@@    </span>
+<span class="pink">      @@</span><span class="soft">@@@@@</span><span class="pink">@@      </span>
+<span class="green">         ||         </span>
+<span class="green">         ||         </span>
+<span class="lime">      &lt;&lt; || &gt;&gt;     </span>
+<span class="green">         ||         </span>
+<span class="green">         ||         </span></pre>
+          </div>
+          <div class="plane">
+            <pre><span class="cyan">         ***         </span>
+<span class="pink">      **</span><span class="soft">*****</span><span class="pink">**      </span>
+<span class="hot">    ***</span><span class="soft">*******</span><span class="hot">***    </span>
+<span class="pink">  ***</span><span class="soft">****</span><span class="yellow">00000</span><span class="soft">****</span><span class="pink">***  </span>
+<span class="soft"> **</span><span class="pink">*****</span><span class="yellow">0000000</span><span class="pink">*****</span><span class="soft">** </span>
+<span class="hot">**</span><span class="pink">*****</span><span class="yellow">000000000</span><span class="pink">*****</span><span class="hot">**</span>
+<span class="soft"> **</span><span class="pink">*****</span><span class="yellow">0000000</span><span class="pink">*****</span><span class="soft">** </span>
+<span class="pink">  ***</span><span class="soft">****</span><span class="yellow">00000</span><span class="soft">****</span><span class="pink">***  </span>
+<span class="hot">    ***</span><span class="soft">*******</span><span class="hot">***    </span>
+<span class="pink">      **</span><span class="soft">*****</span><span class="pink">**      </span>
+<span class="green">         []         </span>
+<span class="green">         []         </span>
+<span class="lime">      == [] ==      </span>
+<span class="green">         []         </span>
+<span class="green">         []         </span></pre>
+          </div>
+          <div class="plane">
+            <pre><span class="hot">         ###         </span>
+<span class="pink">      ##</span><span class="soft">#####</span><span class="pink">##      </span>
+<span class="hot">    ###</span><span class="soft">#######</span><span class="hot">###    </span>
+<span class="pink">  ###</span><span class="soft">####</span><span class="yellow">+++++</span><span class="soft">####</span><span class="pink">###  </span>
+<span class="soft"> ##</span><span class="pink">#####</span><span class="yellow">+++++++</span><span class="pink">#####</span><span class="soft">## </span>
+<span class="hot">##</span><span class="pink">#####</span><span class="yellow">+++++++++</span><span class="pink">#####</span><span class="hot">##</span>
+<span class="soft"> ##</span><span class="pink">#####</span><span class="yellow">+++++++</span><span class="pink">#####</span><span class="soft">## </span>
+<span class="pink">  ###</span><span class="soft">####</span><span class="yellow">+++++</span><span class="soft">####</span><span class="pink">###  </span>
+<span class="hot">    ###</span><span class="soft">#######</span><span class="hot">###    </span>
+<span class="pink">      ##</span><span class="soft">#####</span><span class="pink">##      </span>
+<span class="green">         !!         </span>
+<span class="green">         !!         </span>
+<span class="lime">      // !! \\      </span>
+<span class="green">         !!         </span>
+<span class="green">         !!         </span></pre>
+          </div>
+          <div class="plane">
+            <pre><span class="cyan">         xxx         </span>
+<span class="pink">      xx</span><span class="soft">xxxxx</span><span class="pink">xx      </span>
+<span class="hot">    xxx</span><span class="soft">xxxxxxx</span><span class="hot">xxx    </span>
+<span class="pink">  xxx</span><span class="soft">xxxx</span><span class="yellow">=====</span><span class="soft">xxxx</span><span class="pink">xxx  </span>
+<span class="soft"> xx</span><span class="pink">xxxxx</span><span class="yellow">=======</span><span class="pink">xxxxx</span><span class="soft">xx </span>
+<span class="hot">xx</span><span class="pink">xxxxx</span><span class="yellow">=========</span><span class="pink">xxxxx</span><span class="hot">xx</span>
+<span class="soft"> xx</span><span class="pink">xxxxx</span><span class="yellow">=======</span><span class="pink">xxxxx</span><span class="soft">xx </span>
+<span class="pink">  xxx</span><span class="soft">xxxx</span><span class="yellow">=====</span><span class="soft">xxxx</span><span class="pink">xxx  </span>
+<span class="hot">    xxx</span><span class="soft">xxxxxxx</span><span class="hot">xxx    </span>
+<span class="pink">      xx</span><span class="soft">xxxxx</span><span class="pink">xx      </span>
+<span class="green">         ::         </span>
+<span class="green">         ::         </span>
+<span class="lime">      -- :: --      </span>
+<span class="green">         ::         </span>
+<span class="green">         ::         </span></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+    </section>
+
+    <section class="view" id="kittyView" aria-label="Rotating ANSI hologram Hello Kitty face" hidden>
+    <section class="window hologram">
+      <div class="bar">
+        <span>HOLO_KITTY.EXE</span>
+        <span><i></i><i></i><i></i></span>
+      </div>
+      <div class="stage" data-run="C:\HOLO\KITTY.EXE" data-code="SCAN: FACE // ANSI HOLOGRAM">
+        <div class="art3d kitty3d ascii-rendered" data-model="kitty" aria-hidden="true">
+          <div class="plane">
+            <pre class="ascii-output"><span class="cyan">     /\               /\     </span>
+<span class="cyan">    /  \_____________/  \    </span>
+<span class="white">   /                     \   </span>
+<span class="white">  |   ==           ==     |  </span>
+<span class="white">  |      .       .        |  </span>
+<span class="white">  |          ^            |  </span>
+<span class="white">  |    ---       ---      |  </span>
+<span class="white">   \        ___          /   </span>
+<span class="cyan">    \___________________/    </span>
+<span class="hot">       [::]===== [::]        </span>
+<span class="pink">        \\  BOW  //         </span></pre>
+          </div>
+          <div class="plane">
+            <pre><span class="violet">     /\               /\     </span>
+<span class="cyan">    /##\_____________/##\    </span>
+<span class="white">   /#####################\   </span>
+<span class="white">  |###</span><span class="black">@@</span><span class="white">###########</span><span class="black">@@</span><span class="white">####|  </span>
+<span class="white">  |########</span><span class="yellow">.</span><span class="white">#####</span><span class="yellow">.</span><span class="white">######|  </span>
+<span class="white">  |###########</span><span class="yellow">^</span><span class="white">#########|  </span>
+<span class="white">  |#####</span><span class="cyan">---</span><span class="white">#####</span><span class="cyan">---</span><span class="white">#####|  </span>
+<span class="white">   \########</span><span class="soft">___</span><span class="white">########/   </span>
+<span class="cyan">    \___________________/    </span>
+<span class="hot">       &lt;&lt;&gt;&gt;=====&lt;&lt;&gt;&gt;       </span>
+<span class="pink">        \\  BOW  //         </span></pre>
+          </div>
+          <div class="plane">
+            <pre><span class="cyan">     ^^               ^^     </span>
+<span class="violet">    /  \_____________/  \    </span>
+<span class="white">   |                     |   </span>
+<span class="white">  |    **         **      |  </span>
+<span class="white">  |       o     o         |  </span>
+<span class="white">  |          v            |  </span>
+<span class="cyan">  |    ---       ---      |  </span>
+<span class="white">   |        ___          |   </span>
+<span class="violet">    \___________________/    </span>
+<span class="hot">       &lt;[]&gt;=====&lt;[]&gt;       </span>
+<span class="pink">        \\  BOW  //         </span></pre>
+          </div>
+          <div class="plane">
+            <pre><span class="violet">     /\               /\     </span>
+<span class="cyan">    /  \_____________/  \    </span>
+<span class="white">   /.....................\   </span>
+<span class="white">  |....00.........00......|  </span>
+<span class="white">  |.......+.....+.........|  </span>
+<span class="white">  |...........*...........|  </span>
+<span class="cyan">  |....---.......---......|  </span>
+<span class="white">   \........___........../   </span>
+<span class="cyan">    \___________________/    </span>
+<span class="hot">       ((()))===((()))       </span>
+<span class="pink">        \\  BOW  //         </span></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+    </section>
+
+    <section class="view" id="ladybugView" aria-label="Rotating ANSI hologram ladybug" hidden>
+    <section class="window hologram">
+      <div class="bar">
+        <span>LADYBUG_VIEW.EXE</span>
+        <span><i></i><i></i><i></i></span>
+      </div>
+      <div class="stage" data-run="C:\GARDEN\LADYBUG.EXE" data-code="SCAN: BUG // ANSI HOLOGRAM">
+        <div class="art3d ladybug3d ascii-rendered" data-model="ladybug" aria-hidden="true">
+          <div class="plane">
+            <pre class="ascii-output"><span class="red">        LADYBUG MODEL LOADING        </span></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+    </section>
+  </main>
+
+  <section class="cli" aria-label="Cute terminal message CLI">
+    <div class="cli-log" id="cliLog" aria-live="polite">
+      <div class="cli-line reply">SYSTEM: type a message for a tiny cute reply.</div>
+    </div>
+    <form class="cli-form" id="cliForm">
+      <span class="cli-prompt">KAI&gt;</span>
+      <input id="cliInput" name="message" type="text" autocomplete="off" maxlength="80" placeholder="say something cute..." aria-label="Message">
+      <button type="submit" aria-label="Send message">SEND</button>
+    </form>
+  </section>
+
+  <div class="controls">
+    <button type="button" id="viewToggle" aria-label="Switch art page" title="Switch art page">KITTY</button>
+    <button type="button" id="pause" aria-label="Pause or play animation" title="Pause or play">II</button>
+    <button type="button" id="speed" aria-label="Toggle animation speed" title="Toggle speed">2X</button>
+  </div>
+
+  <script>
+    const flowerView = document.querySelector("#flowerView");
+    const kittyView = document.querySelector("#kittyView");
+    const ladybugView = document.querySelector("#ladybugView");
+    const screenTitle = document.querySelector("#screenTitle");
+    const screenCopy = document.querySelector("#screenCopy");
+    const viewToggle = document.querySelector("#viewToggle");
+    const pauseButton = document.querySelector("#pause");
+    const speedButton = document.querySelector("#speed");
+    const cliForm = document.querySelector("#cliForm");
+    const cliInput = document.querySelector("#cliInput");
+    const cliLog = document.querySelector("#cliLog");
+    let currentView = "flower";
+    const views = {
+      flower: {
+        node: flowerView,
+        next: "kitty",
+        button: "KITTY",
+        title: "Pixel<br>Flower",
+        copy: "Pretty pink flower for my honey :3"
+      },
+      kitty: {
+        node: kittyView,
+        next: "ladybug",
+        button: "LADYBUG",
+        title: "Holo<br>Kitty",
+        copy: "Hehe HOLO kitty, get it? Like hologram hello kitty? :3"
+      },
+      ladybug: {
+        node: ladybugView,
+        next: "flower",
+        button: "FLOWER",
+        title: "Cutie<br>Ladybug",
+        copy: "A ladybug for my ladybug! :3"
+      }
+    };
+    const cuteReplies = [
+      "sending you a pocket-sized sparkle packet.",
+      "your message grew a tiny flower in the terminal.",
+      "beep boop: affection successfully compiled.",
+      "a little pixel heart is orbiting you now.",
+      "the garden accepts this transmission.",
+      "soft signal received. storing it next to the stars.",
+      "you unlocked one bonus glimmer.",
+      "message wrapped in a bow and delivered.",
+      "tiny hologram says: you are very cherished.",
+      "ladybug protocol says good luck is inbound."
+    ];
+    const RENDER_WIDTH = 64;
+    const RENDER_HEIGHT = 40;
+
+    const renderers = [...document.querySelectorAll(".art3d")].map((art) => {
+      const renderer = {
+        art,
+        output: art.querySelector(".ascii-output"),
+        model: buildModel(art.dataset.model),
+        hover: false,
+        hoverCol: -99,
+        hoverRow: -99,
+        angle: 0,
+        dragYaw: 0,
+        dragPitch: 0,
+        dragging: false,
+        lastX: 0,
+        lastY: 0,
+        moved: false,
+        ripples: [],
+        glitch: 0,
+        glitchSeed: 0
+      };
+
+      function updateHoverCell(event) {
+        const rect = renderer.output.getBoundingClientRect();
+        renderer.hoverCol = Math.floor(((event.clientX - rect.left) / rect.width) * RENDER_WIDTH);
+        renderer.hoverRow = Math.floor(((event.clientY - rect.top) / rect.height) * RENDER_HEIGHT);
+      }
+
+      art.addEventListener("mouseenter", () => {
+        renderer.hover = true;
+        art.classList.add("squares");
+      });
+
+      art.addEventListener("pointermove", (event) => {
+        updateHoverCell(event);
+
+        if (!renderer.dragging) {
+          return;
+        }
+
+        const dx = event.clientX - renderer.lastX;
+        const dy = event.clientY - renderer.lastY;
+        const speed = Math.hypot(dx, dy);
+        renderer.dragYaw += dx * 0.012;
+        renderer.dragPitch = Math.max(-0.85, Math.min(0.85, renderer.dragPitch + dy * 0.01));
+        if (speed > 10) {
+          renderer.glitch = Math.min(1, renderer.glitch + (speed - 10) / 150);
+          renderer.glitchSeed += speed * 0.17;
+        }
+        renderer.lastX = event.clientX;
+        renderer.lastY = event.clientY;
+        renderer.moved = renderer.moved || Math.abs(dx) + Math.abs(dy) > 2;
+      });
+
+      art.addEventListener("mouseleave", () => {
+        renderer.hover = false;
+        art.classList.remove("squares");
+      });
+
+      art.addEventListener("pointerdown", (event) => {
+        event.preventDefault();
+        renderer.dragging = true;
+        renderer.moved = false;
+        renderer.lastX = event.clientX;
+        renderer.lastY = event.clientY;
+        updateHoverCell(event);
+        art.classList.add("dragging");
+        art.setPointerCapture(event.pointerId);
+      });
+
+      art.addEventListener("pointerup", (event) => {
+        renderer.dragging = false;
+        art.classList.remove("dragging");
+        if (art.hasPointerCapture(event.pointerId)) {
+          art.releasePointerCapture(event.pointerId);
+        }
+      });
+
+      art.addEventListener("pointercancel", () => {
+        renderer.dragging = false;
+        art.classList.remove("dragging");
+      });
+
+      art.addEventListener("click", (event) => {
+        if (renderer.moved) {
+          renderer.moved = false;
+          return;
+        }
+
+        const stage = art.closest(".stage");
+        const rect = stage.getBoundingClientRect();
+        updateHoverCell(event);
+        renderer.ripples.push({
+          col: renderer.hoverCol,
+          row: renderer.hoverRow,
+          start: performance.now()
+        });
+
+        const ripple = document.createElement("span");
+        ripple.className = "ripple";
+        ripple.style.setProperty("--rx", `${event.clientX - rect.left}px`);
+        ripple.style.setProperty("--ry", `${event.clientY - rect.top}px`);
+        stage.appendChild(ripple);
+        ripple.addEventListener("animationend", () => ripple.remove());
+      });
+
+      return renderer;
+    });
+
+    function addPoint(points, x, y, z, className, char) {
+      points.push({ x, y, z, className, char });
+    }
+
+    function addEllipsoid(points, cx, cy, cz, rx, ry, rz, className, char) {
+      for (let y = Math.floor(cy - ry); y <= Math.ceil(cy + ry); y += 1) {
+        for (let x = Math.floor(cx - rx); x <= Math.ceil(cx + rx); x += 1) {
+          for (let z = Math.floor(cz - rz); z <= Math.ceil(cz + rz); z += 1) {
+            const d =
+              ((x - cx) ** 2) / (rx ** 2) +
+              ((y - cy) ** 2) / (ry ** 2) +
+              ((z - cz) ** 2) / (rz ** 2);
+            if (d <= 1) {
+              addPoint(points, x, y, z, className, char);
+            }
+          }
+        }
+      }
+    }
+
+    function addTriangle(points, cx, cy, cz, height, width, depth, className, char) {
+      for (let y = 0; y <= height; y += 1) {
+        const rowWidth = Math.round(width * (y / height));
+        for (let x = -rowWidth; x <= rowWidth; x += 1) {
+          for (let z = -depth; z <= depth; z += 1) {
+            addPoint(points, cx + x, cy + y, cz + z, className, char);
+          }
+        }
+      }
+    }
+
+    function addLine(points, x1, y1, z1, x2, y2, z2, className, char) {
+      const steps = Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1), Math.abs(z2 - z1));
+      for (let i = 0; i <= steps; i += 1) {
+        const t = steps === 0 ? 0 : i / steps;
+        addPoint(
+          points,
+          Math.round(x1 + (x2 - x1) * t),
+          Math.round(y1 + (y2 - y1) * t),
+          Math.round(z1 + (z2 - z1) * t),
+          className,
+          char
+        );
+      }
+    }
+
+    function buildModel(type) {
+      if (type === "kitty") {
+        return buildKittyModel();
+      }
+
+      if (type === "ladybug") {
+        return buildLadybugModel();
+      }
+
+      return buildFlowerModel();
+    }
+
+    function buildFlowerModel() {
+      const points = [];
+      addEllipsoid(points, 0, -13, 0, 8, 6, 5, "soft", "@");
+      addEllipsoid(points, -10, -5, 0, 8, 6, 5, "pink", "@");
+      addEllipsoid(points, 10, -5, 0, 8, 6, 5, "pink", "@");
+      addEllipsoid(points, 0, 4, 0, 8, 6, 5, "hot", "@");
+      addEllipsoid(points, -7, -11, 1, 5, 4, 4, "hot", "@");
+      addEllipsoid(points, 7, -11, 1, 5, 4, 4, "hot", "@");
+      addEllipsoid(points, -7, 2, 1, 5, 4, 4, "soft", "@");
+      addEllipsoid(points, 7, 2, 1, 5, 4, 4, "soft", "@");
+      addEllipsoid(points, 0, -5, 0, 7, 5, 7, "yellow", "#");
+      addEllipsoid(points, 0, -5, 0, 4, 3, 9, "yellow", "0");
+
+      for (let y = 5; y <= 24; y += 1) {
+        addEllipsoid(points, 0, y, 0, 2, 1, 2, "green", "|");
+      }
+
+      addEllipsoid(points, -7, 15, 0, 7, 3, 3, "lime", "<");
+      addEllipsoid(points, 7, 16, 0, 7, 3, 3, "lime", ">");
+      return points;
+    }
+
+    function buildKittyModel() {
+      const points = [];
+      addEllipsoid(points, 0, 1, 0, 22, 13, 6, "white", "#");
+      addTriangle(points, -15, -20, 0, 11, 7, 4, "white", "/");
+      addTriangle(points, 15, -20, 0, 11, 7, 4, "white", "\\");
+
+      addEllipsoid(points, -9, 2, 9, 2, 4, 1, "black", "0");
+      addEllipsoid(points, 9, 2, 9, 2, 4, 1, "black", "0");
+      addEllipsoid(points, 0, 8, 10, 3, 2, 1, "yellow", "*");
+
+      addLine(points, -20, 1, 10, -12, 0, 10, "cyan", "-");
+      addLine(points, -20, 5, 10, -12, 5, 10, "cyan", "-");
+      addLine(points, -20, 9, 10, -12, 8, 10, "cyan", "-");
+      addLine(points, 12, 0, 10, 20, 1, 10, "cyan", "-");
+      addLine(points, 12, 5, 10, 20, 5, 10, "cyan", "-");
+      addLine(points, 12, 8, 10, 20, 9, 10, "cyan", "-");
+
+      addEllipsoid(points, 11, -14, 10, 5, 7, 2, "hot", "<");
+      addEllipsoid(points, 21, -9, 10, 5, 7, 2, "hot", ">");
+      addEllipsoid(points, 16, -11, 11, 4, 4, 2, "pink", "+");
+      return points;
+    }
+
+    function buildLadybugModel() {
+      const points = [];
+      addEllipsoid(points, 0, 2, 0, 16, 20, 7, "red", "@");
+      addEllipsoid(points, 0, -18, 0, 9, 7, 6, "black", "0");
+
+      for (let y = -13; y <= 20; y += 1) {
+        addEllipsoid(points, 0, y, 7, 1, 1, 1, "black", "|");
+      }
+
+      const spots = [
+        [-8, -7],
+        [8, -7],
+        [-10, 4],
+        [10, 4],
+        [-6, 14],
+        [6, 14]
+      ];
+
+      for (const [x, y] of spots) {
+        addEllipsoid(points, x, y, 8, 3, 3, 1, "black", "o");
+      }
+
+      addEllipsoid(points, -4, -20, 7, 2, 2, 1, "cyan", "0");
+      addEllipsoid(points, 4, -20, 7, 2, 2, 1, "cyan", "0");
+      addLine(points, -4, -24, 4, -10, -30, 6, "black", "\\");
+      addLine(points, 4, -24, 4, 10, -30, 6, "black", "/");
+      addEllipsoid(points, -11, -31, 6, 1, 1, 1, "cyan", "*");
+      addEllipsoid(points, 11, -31, 6, 1, 1, 1, "cyan", "*");
+
+      for (const side of [-1, 1]) {
+        addLine(points, side * 13, -7, 1, side * 23, -13, 1, "black", "-");
+        addLine(points, side * 15, 3, 1, side * 26, 3, 1, "black", "-");
+        addLine(points, side * 13, 13, 1, side * 23, 19, 1, "black", "-");
+      }
+
+      return points;
+    }
+
+    function escapeHtml(value) {
+      return value
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function renderAscii(renderer) {
+      const width = RENDER_WIDTH;
+      const height = RENDER_HEIGHT;
+      const grid = Array.from({ length: height }, () =>
+        Array.from({ length: width }, () => ({ depth: -Infinity, char: " ", className: "" }))
+      );
+      const fast = document.body.classList.contains("fast");
+      const paused = document.body.classList.contains("paused");
+      const hoverRadius = 6;
+      const now = performance.now();
+      const glitchClasses = ["cyan", "hot", "yellow", "lime", "violet", "pink"];
+
+      renderer.ripples = renderer.ripples.filter((ripple) => now - ripple.start < 720);
+      renderer.glitch *= 0.92;
+      renderer.art.classList.toggle("glitching", renderer.glitch > 0.32);
+
+      if (!paused) {
+        renderer.angle += fast ? 0.038 : 0.012;
+      }
+
+      const yaw = renderer.angle + renderer.dragYaw;
+      const pitch = 0.18 + renderer.dragPitch;
+      const cosY = Math.cos(yaw);
+      const sinY = Math.sin(yaw);
+      const cosX = Math.cos(pitch);
+      const sinX = Math.sin(pitch);
+
+      for (const point of renderer.model) {
+        const x1 = point.x * cosY + point.z * sinY;
+        const z1 = -point.x * sinY + point.z * cosY;
+        const y1 = point.y * cosX - z1 * sinX;
+        const z2 = point.y * sinX + z1 * cosX;
+        const perspective = 1 / (1 + (z2 + 36) / 120);
+        let col = Math.round(width / 2 + x1 * 1.28 * perspective);
+        const row = Math.round(height / 2 + y1 * 1.02 * perspective);
+
+        if (renderer.glitch > 0.28) {
+          const rowNoise = Math.sin(row * 1.7 + renderer.glitchSeed + now * 0.035);
+          const bandNoise = Math.sin(row * 0.5 + renderer.glitchSeed);
+          col += Math.round((rowNoise + bandNoise) * renderer.glitch * 3);
+        }
+
+        if (row < 0 || row >= height || col < 0 || col >= width) {
+          continue;
+        }
+
+        if (z2 > grid[row][col].depth) {
+          const nearCursor =
+            renderer.hover &&
+            Math.hypot(col - renderer.hoverCol, row - renderer.hoverRow) <= hoverRadius;
+          const rippleHit = renderer.ripples.some((ripple) => {
+            const age = now - ripple.start;
+            const wave = (age / 720) * 25;
+            const distance = Math.hypot(col - ripple.col, row - ripple.row);
+            return Math.abs(distance - wave) <= 1.4;
+          });
+          const rainbowClasses = ["hot", "yellow", "lime", "cyan", "violet", "pink"];
+          const rainbowClass = rainbowClasses[Math.abs((row + col) % rainbowClasses.length)];
+          const glitchHit =
+            renderer.glitch > 0.38 &&
+            Math.sin(row * 8.1 + col * 2.7 + renderer.glitchSeed + now * 0.05) > 0.72;
+          const glitchClass = glitchClasses[Math.abs((row * 3 + col + Math.floor(renderer.glitchSeed)) % glitchClasses.length)];
+
+          grid[row][col] = {
+            depth: z2,
+            char: glitchHit ? ["#", "%", "&", "=", "+"][Math.abs((row + col) % 5)] : rippleHit ? "*" : nearCursor ? "\u25A0" : point.char,
+            className: glitchHit ? glitchClass : rippleHit ? rainbowClass : point.className
+          };
+        }
+      }
+
+      let html = "";
+      let activeClass = "";
+
+      for (const row of grid) {
+        for (const cell of row) {
+          if (cell.className !== activeClass) {
+            if (activeClass) {
+              html += "</span>";
+            }
+            activeClass = cell.className;
+            if (activeClass) {
+              html += `<span class="${activeClass}">`;
+            }
+          }
+
+          html += escapeHtml(cell.char);
+        }
+
+        if (activeClass) {
+          html += "</span>";
+          activeClass = "";
+        }
+
+        html += "\n";
+      }
+
+      renderer.output.innerHTML = html;
+    }
+
+    function animateAscii() {
+      for (const renderer of renderers) {
+        if (renderer.art.closest(".view").hidden) {
+          continue;
+        }
+
+        renderAscii(renderer);
+      }
+
+      requestAnimationFrame(animateAscii);
+    }
+
+    animateAscii();
+
+    function addCliLine(text, className = "") {
+      const line = document.createElement("div");
+      line.className = `cli-line ${className}`.trim();
+      line.textContent = text;
+      cliLog.appendChild(line);
+
+      while (cliLog.children.length > 5) {
+        cliLog.removeChild(cliLog.firstElementChild);
+      }
+    }
+
+    function getCuteReply(message) {
+      const lower = message.toLowerCase();
+
+      if (lower.includes("kitty") || lower.includes("cat")) {
+        return "MRRRROW! A tiny holographic kitty purrs in back. :3";
+      }
+
+      if (lower.includes("bug") || lower.includes("ladybug")) {
+        return "I love u bug <3";
+      }
+
+      if (lower.includes("fart")) {
+        return "Bruh...";
+      }
+
+      if (lower.includes("bear")) {
+        return "Da best kitty in da world! :3";
+      }
+
+      if (lower.includes("bunny")) {
+        return "Bunny loves u so much! :3";
+      }
+
+      if (lower.includes("mario kart") || lower.includes("mariokart") || lower.includes("mk") || lower.includes("mk8")) {
+        return "ya i know ur better than me at mario kart....";
+      }
+      if (lower.includes("i love you") || lower.includes("love u") || lower.includes("luv u") || lower.includes("ily")) {
+        return "I love you too! <3";
+      }
+
+      let hash = 0;
+      for (const char of message) {
+        hash = (hash + char.charCodeAt(0) * 17) % cuteReplies.length;
+      }
+
+      return cuteReplies[hash];
+    }
+
+    cliForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const message = cliInput.value.trim();
+
+      if (!message) {
+        addCliLine("KAI> ...", "");
+        addCliLine("SYSTEM: even silence has a little sparkle.", "reply");
+        return;
+      }
+
+      addCliLine(`KAI> ${message}`);
+      addCliLine(`SYSTEM: ${getCuteReply(message)}`, "reply");
+      cliInput.value = "";
+    });
+
+    viewToggle.addEventListener("click", () => {
+      currentView = views[currentView].next;
+
+      for (const view of Object.values(views)) {
+        view.node.hidden = true;
+      }
+
+      const active = views[currentView];
+      active.node.hidden = false;
+      viewToggle.textContent = active.button;
+      screenTitle.innerHTML = active.title;
+      screenCopy.textContent = active.copy;
+    });
+
+    pauseButton.addEventListener("click", () => {
+      document.body.classList.toggle("paused");
+      pauseButton.textContent = document.body.classList.contains("paused") ? ">" : "II";
+    });
+
+    speedButton.addEventListener("click", () => {
+      document.body.classList.toggle("fast");
+    });
+  </script>
+</body>
+</html>
