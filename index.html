@@ -202,8 +202,6 @@
       width: min(84vw, 43rem);
       height: min(84vw, 43rem);
       max-height: 43rem;
-      transform-style: preserve-3d;
-      animation: spin 7.5s linear infinite;
       cursor: grab;
       touch-action: none;
       user-select: none;
@@ -214,37 +212,13 @@
       cursor: grabbing;
     }
 
-    .art3d.ascii-rendered {
-      animation: none;
-      transform-style: flat;
-    }
-
-    .art3d.ascii-rendered .plane {
-      transform: none;
-      opacity: 1;
-    }
-
-    .art3d.ascii-rendered .plane:not(:first-child) {
-      display: none;
-    }
-
-    .kitty3d {
-      animation-duration: 8.8s;
-    }
-
     .plane {
       position: absolute;
       inset: 0;
       display: grid;
       place-items: center;
-      transform-style: preserve-3d;
       filter: drop-shadow(0 0 0.75rem rgba(255, 63, 188, 0.5));
     }
-
-    .plane:nth-child(1) { transform: translateZ(0); opacity: 1; }
-    .plane:nth-child(2) { transform: rotateY(90deg) translateZ(0); opacity: 0.86; }
-    .plane:nth-child(3) { transform: rotateY(45deg) translateZ(-0.5rem); opacity: 0.55; }
-    .plane:nth-child(4) { transform: rotateY(-45deg) translateZ(-0.5rem); opacity: 0.55; }
 
     .ascii-output {
       min-width: 64ch;
@@ -506,24 +480,6 @@
       background: var(--cyan);
     }
 
-    body.paused .art3d {
-      animation-play-state: paused;
-    }
-
-    body.fast .art3d {
-      animation-duration: 3.2s;
-    }
-
-    @keyframes spin {
-      from {
-        transform: rotateX(8deg) rotateY(0deg) rotateZ(-1deg);
-      }
-
-      to {
-        transform: rotateX(8deg) rotateY(360deg) rotateZ(-1deg);
-      }
-    }
-
     @keyframes blink {
       50% {
         opacity: 0;
@@ -633,7 +589,7 @@
         <span><i></i><i></i><i></i></span>
       </div>
       <div class="stage" data-run="C:\FLOWER\RUN.EXE" data-code="01001101 00110010 01001011  4KAI">
-        <div class="art3d flower3d ascii-rendered" data-model="flower" aria-hidden="true">
+        <div class="art3d" data-model="flower" aria-hidden="true">
           <div class="plane">
             <pre class="ascii-output"><span class="hot">         @@@         </span>
 <span class="pink">      @@</span><span class="soft">@@@@@</span><span class="pink">@@      </span>
@@ -651,57 +607,6 @@
 <span class="green">         ||         </span>
 <span class="green">         ||         </span></pre>
           </div>
-          <div class="plane">
-            <pre><span class="cyan">         ***         </span>
-<span class="pink">      **</span><span class="soft">*****</span><span class="pink">**      </span>
-<span class="hot">    ***</span><span class="soft">*******</span><span class="hot">***    </span>
-<span class="pink">  ***</span><span class="soft">****</span><span class="yellow">00000</span><span class="soft">****</span><span class="pink">***  </span>
-<span class="soft"> **</span><span class="pink">*****</span><span class="yellow">0000000</span><span class="pink">*****</span><span class="soft">** </span>
-<span class="hot">**</span><span class="pink">*****</span><span class="yellow">000000000</span><span class="pink">*****</span><span class="hot">**</span>
-<span class="soft"> **</span><span class="pink">*****</span><span class="yellow">0000000</span><span class="pink">*****</span><span class="soft">** </span>
-<span class="pink">  ***</span><span class="soft">****</span><span class="yellow">00000</span><span class="soft">****</span><span class="pink">***  </span>
-<span class="hot">    ***</span><span class="soft">*******</span><span class="hot">***    </span>
-<span class="pink">      **</span><span class="soft">*****</span><span class="pink">**      </span>
-<span class="green">         []         </span>
-<span class="green">         []         </span>
-<span class="lime">      == [] ==      </span>
-<span class="green">         []         </span>
-<span class="green">         []         </span></pre>
-          </div>
-          <div class="plane">
-            <pre><span class="hot">         ###         </span>
-<span class="pink">      ##</span><span class="soft">#####</span><span class="pink">##      </span>
-<span class="hot">    ###</span><span class="soft">#######</span><span class="hot">###    </span>
-<span class="pink">  ###</span><span class="soft">####</span><span class="yellow">+++++</span><span class="soft">####</span><span class="pink">###  </span>
-<span class="soft"> ##</span><span class="pink">#####</span><span class="yellow">+++++++</span><span class="pink">#####</span><span class="soft">## </span>
-<span class="hot">##</span><span class="pink">#####</span><span class="yellow">+++++++++</span><span class="pink">#####</span><span class="hot">##</span>
-<span class="soft"> ##</span><span class="pink">#####</span><span class="yellow">+++++++</span><span class="pink">#####</span><span class="soft">## </span>
-<span class="pink">  ###</span><span class="soft">####</span><span class="yellow">+++++</span><span class="soft">####</span><span class="pink">###  </span>
-<span class="hot">    ###</span><span class="soft">#######</span><span class="hot">###    </span>
-<span class="pink">      ##</span><span class="soft">#####</span><span class="pink">##      </span>
-<span class="green">         !!         </span>
-<span class="green">         !!         </span>
-<span class="lime">      // !! \\      </span>
-<span class="green">         !!         </span>
-<span class="green">         !!         </span></pre>
-          </div>
-          <div class="plane">
-            <pre><span class="cyan">         xxx         </span>
-<span class="pink">      xx</span><span class="soft">xxxxx</span><span class="pink">xx      </span>
-<span class="hot">    xxx</span><span class="soft">xxxxxxx</span><span class="hot">xxx    </span>
-<span class="pink">  xxx</span><span class="soft">xxxx</span><span class="yellow">=====</span><span class="soft">xxxx</span><span class="pink">xxx  </span>
-<span class="soft"> xx</span><span class="pink">xxxxx</span><span class="yellow">=======</span><span class="pink">xxxxx</span><span class="soft">xx </span>
-<span class="hot">xx</span><span class="pink">xxxxx</span><span class="yellow">=========</span><span class="pink">xxxxx</span><span class="hot">xx</span>
-<span class="soft"> xx</span><span class="pink">xxxxx</span><span class="yellow">=======</span><span class="pink">xxxxx</span><span class="soft">xx </span>
-<span class="pink">  xxx</span><span class="soft">xxxx</span><span class="yellow">=====</span><span class="soft">xxxx</span><span class="pink">xxx  </span>
-<span class="hot">    xxx</span><span class="soft">xxxxxxx</span><span class="hot">xxx    </span>
-<span class="pink">      xx</span><span class="soft">xxxxx</span><span class="pink">xx      </span>
-<span class="green">         ::         </span>
-<span class="green">         ::         </span>
-<span class="lime">      -- :: --      </span>
-<span class="green">         ::         </span>
-<span class="green">         ::         </span></pre>
-          </div>
         </div>
       </div>
     </section>
@@ -714,7 +619,7 @@
         <span><i></i><i></i><i></i></span>
       </div>
       <div class="stage" data-run="C:\HOLO\KITTY.EXE" data-code="SCAN: FACE // ANSI HOLOGRAM">
-        <div class="art3d kitty3d ascii-rendered" data-model="kitty" aria-hidden="true">
+        <div class="art3d" data-model="kitty" aria-hidden="true">
           <div class="plane">
             <pre class="ascii-output"><span class="cyan">     /\               /\     </span>
 <span class="cyan">    /  \_____________/  \    </span>
@@ -726,45 +631,6 @@
 <span class="white">   \        ___          /   </span>
 <span class="cyan">    \___________________/    </span>
 <span class="hot">       [::]===== [::]        </span>
-<span class="pink">        \\  BOW  //         </span></pre>
-          </div>
-          <div class="plane">
-            <pre><span class="violet">     /\               /\     </span>
-<span class="cyan">    /##\_____________/##\    </span>
-<span class="white">   /#####################\   </span>
-<span class="white">  |###</span><span class="black">@@</span><span class="white">###########</span><span class="black">@@</span><span class="white">####|  </span>
-<span class="white">  |########</span><span class="yellow">.</span><span class="white">#####</span><span class="yellow">.</span><span class="white">######|  </span>
-<span class="white">  |###########</span><span class="yellow">^</span><span class="white">#########|  </span>
-<span class="white">  |#####</span><span class="cyan">---</span><span class="white">#####</span><span class="cyan">---</span><span class="white">#####|  </span>
-<span class="white">   \########</span><span class="soft">___</span><span class="white">########/   </span>
-<span class="cyan">    \___________________/    </span>
-<span class="hot">       &lt;&lt;&gt;&gt;=====&lt;&lt;&gt;&gt;       </span>
-<span class="pink">        \\  BOW  //         </span></pre>
-          </div>
-          <div class="plane">
-            <pre><span class="cyan">     ^^               ^^     </span>
-<span class="violet">    /  \_____________/  \    </span>
-<span class="white">   |                     |   </span>
-<span class="white">  |    **         **      |  </span>
-<span class="white">  |       o     o         |  </span>
-<span class="white">  |          v            |  </span>
-<span class="cyan">  |    ---       ---      |  </span>
-<span class="white">   |        ___          |   </span>
-<span class="violet">    \___________________/    </span>
-<span class="hot">       &lt;[]&gt;=====&lt;[]&gt;       </span>
-<span class="pink">        \\  BOW  //         </span></pre>
-          </div>
-          <div class="plane">
-            <pre><span class="violet">     /\               /\     </span>
-<span class="cyan">    /  \_____________/  \    </span>
-<span class="white">   /.....................\   </span>
-<span class="white">  |....00.........00......|  </span>
-<span class="white">  |.......+.....+.........|  </span>
-<span class="white">  |...........*...........|  </span>
-<span class="cyan">  |....---.......---......|  </span>
-<span class="white">   \........___........../   </span>
-<span class="cyan">    \___________________/    </span>
-<span class="hot">       ((()))===((()))       </span>
 <span class="pink">        \\  BOW  //         </span></pre>
           </div>
         </div>
@@ -779,7 +645,7 @@
         <span><i></i><i></i><i></i></span>
       </div>
       <div class="stage" data-run="C:\GARDEN\LADYBUG.EXE" data-code="SCAN: BUG // ANSI HOLOGRAM">
-        <div class="art3d ladybug3d ascii-rendered" data-model="ladybug" aria-hidden="true">
+        <div class="art3d" data-model="ladybug" aria-hidden="true">
           <div class="plane">
             <pre class="ascii-output"><span class="red">        LADYBUG MODEL LOADING        </span></pre>
           </div>
@@ -795,7 +661,7 @@
         <span><i></i><i></i><i></i></span>
       </div>
       <div class="stage" data-run="C:\GARAGE\MIATA.EXE" data-code="SCAN: MIAT // ANSI HOLOGRAM">
-        <div class="art3d miata3d ascii-rendered" data-model="miata" aria-hidden="true">
+        <div class="art3d" data-model="miata" aria-hidden="true">
           <div class="plane">
             <pre class="ascii-output"><span class="pink">        PINK MIATA MODEL LOADING       </span></pre>
           </div>
@@ -840,10 +706,10 @@
     let currentView = "flower";
     let bootFinished = false;
     const bootLines = [
-      "KAI-DOS BIOS v4.30  Copyright (C) 2003-2026",
+      "KAI-DOS BIOS v2.20  Copyright (C) 2003-2026",
       "CPU: HEART/4.20 GHz",
       "MEMORY TEST: 640 GB OK",
-      "SPINE: ERROR @ ",
+      "SPINE: ERROR @ L5 and C5 - RECOMMEND REPLACEMENT",
       "DETECTING ROMANTIC PERIPHERALS...",
       "  LOVE.............READY",
       "  ADMIRATION......READY",
