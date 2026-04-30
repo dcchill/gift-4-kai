@@ -290,6 +290,75 @@
     .white { color: var(--ink); text-shadow: 0 0 0.8rem rgba(255, 255, 255, 0.7); }
     .black { color: #05020a; text-shadow: 0 0 0.55rem var(--cyan); }
 
+    .boot-screen {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: clamp(1rem, 4vw, 3rem);
+      color: var(--soft);
+      background:
+        linear-gradient(rgba(255, 138, 226, 0.045) 1px, transparent 1px),
+        radial-gradient(circle at 50% 42%, rgba(255, 63, 188, 0.2), transparent 26rem),
+        #09020a;
+      background-size: 100% 3px, auto, auto;
+      z-index: 30;
+      text-shadow: 0 0 0.65rem rgba(255, 63, 188, 0.86);
+      transition: opacity 650ms steps(8), visibility 650ms steps(1);
+    }
+
+    .boot-screen.is-done {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .boot-terminal {
+      width: min(54rem, 100%);
+      min-height: min(38rem, 86vh);
+      border: 2px solid var(--pink);
+      background:
+        linear-gradient(180deg, rgba(255, 138, 226, 0.1), transparent 8rem),
+        rgba(9, 2, 10, 0.92);
+      box-shadow:
+        0 0 0 3px #09020a,
+        0 0 2rem rgba(255, 63, 188, 0.42),
+        inset 0 0 3rem rgba(255, 138, 226, 0.1);
+      overflow: hidden;
+    }
+
+    .boot-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.55rem 0.75rem;
+      border-bottom: 1px solid rgba(255, 138, 226, 0.65);
+      color: #09020a;
+      background: var(--pink);
+      font-size: 0.86rem;
+      font-weight: 700;
+      text-shadow: none;
+    }
+
+    .boot-log {
+      margin: 0;
+      padding: clamp(0.8rem, 2vw, 1.2rem);
+      white-space: pre-wrap;
+      font-size: clamp(0.78rem, 1.7vw, 1rem);
+      line-height: 1.45;
+    }
+
+    .boot-cursor {
+      display: inline-block;
+      width: 0.62em;
+      height: 1em;
+      margin-left: 0.16rem;
+      background: var(--pink);
+      vertical-align: -0.16em;
+      box-shadow: 0 0 0.65rem var(--hot);
+      animation: blink 850ms steps(1) infinite;
+    }
+
     .hologram {
       border-color: var(--cyan);
       box-shadow:
@@ -455,6 +524,12 @@
       }
     }
 
+    @keyframes blink {
+      50% {
+        opacity: 0;
+      }
+    }
+
     @keyframes ripple {
       0% {
         opacity: 0.95;
@@ -534,6 +609,16 @@
   </style>
 </head>
 <body>
+  <section class="boot-screen" id="bootScreen" aria-label="Old terminal boot sequence">
+    <div class="boot-terminal" role="status" aria-live="polite">
+      <div class="boot-header">
+        <span>KAI-DOS 4.30</span>
+        <span>PRESS ANY KEY</span>
+      </div>
+      <pre class="boot-log" id="bootLog"></pre>
+    </div>
+  </section>
+
   <main>
     <section class="title" aria-label="Title">
       <span class="badge">ANSI_3d</span>
@@ -722,7 +807,7 @@
 
   <section class="cli" aria-label="Cute terminal message CLI">
     <div class="cli-log" id="cliLog" aria-live="polite">
-      <div class="cli-line reply">SYSTEM: type a message for a tiny cute reply.</div>
+      <div class="cli-line reply">SYSTEM: type a message for a cute reply.</div>
     </div>
     <form class="cli-form" id="cliForm">
       <span class="cli-prompt">KAI&gt;</span>
@@ -750,7 +835,25 @@
     const cliForm = document.querySelector("#cliForm");
     const cliInput = document.querySelector("#cliInput");
     const cliLog = document.querySelector("#cliLog");
+    const bootScreen = document.querySelector("#bootScreen");
+    const bootLog = document.querySelector("#bootLog");
     let currentView = "flower";
+    let bootFinished = false;
+    const bootLines = [
+      "KAI-DOS BIOS v4.30  Copyright (C) 2003-2026",
+      "CPU: HEART/4.20 GHz",
+      "MEMORY TEST: 640 GB OK",
+      "SPINE: ERROR @ ",
+      "DETECTING ROMANTIC PERIPHERALS...",
+      "  LOVE.............READY",
+      "  ADMIRATION......READY",
+      "  CUTENESS..........READY",
+      "  SWAG.......READY",
+      "MOUNT C:\\LOVE",
+      "LOAD ANSI.SYS",
+      "RUN C:\\FLOWER\\RUN.EXE",
+      "WELCOME KAI <3"
+    ];
     const views = {
       flower: {
         node: flowerView,
@@ -1351,7 +1454,7 @@
       const lower = message.toLowerCase();
 
       if (lower.includes("kitty") || lower.includes("cat")) {
-        return "MRRRROW! A tiny holographic kitty purrs in back. :3";
+        return "MRRRROW! A holographic kitty purrs back. :3";
       }
 
       if (lower.includes("bug") || lower.includes("ladybug")) {
@@ -1431,6 +1534,80 @@
     speedButton.addEventListener("click", () => {
       document.body.classList.toggle("fast");
     });
+
+    function finishBoot() {
+      if (bootFinished) {
+        return;
+      }
+
+      bootFinished = true;
+      bootScreen.classList.add("is-done");
+      window.setTimeout(() => {
+        bootScreen.hidden = true;
+      }, 700);
+    }
+
+    function typeBootLine(line, onDone) {
+      let index = 0;
+      const current = document.createElement("span");
+      bootLog.appendChild(current);
+
+      const tick = () => {
+        if (bootFinished) {
+          return;
+        }
+
+        current.textContent = line.slice(0, index);
+        index += 1;
+
+        if (index <= line.length) {
+          window.setTimeout(tick, 10 + Math.random() * 18);
+          return;
+        }
+
+        current.insertAdjacentText("afterend", "\n");
+        window.setTimeout(onDone, 70 + Math.random() * 120);
+      };
+
+      tick();
+    }
+
+    function runBootSequence() {
+      const cursor = document.createElement("span");
+      cursor.className = "boot-cursor";
+
+      let lineIndex = 0;
+      const next = () => {
+        if (bootFinished) {
+          return;
+        }
+
+        if (cursor.parentNode) {
+          cursor.remove();
+        }
+
+        if (lineIndex >= bootLines.length) {
+          bootLog.appendChild(cursor);
+          window.setTimeout(() => {
+            sparkleActiveModel(0.65);
+            finishBoot();
+          }, 650);
+          return;
+        }
+
+        typeBootLine(bootLines[lineIndex], () => {
+          lineIndex += 1;
+          bootLog.appendChild(cursor);
+          next();
+        });
+      };
+
+      next();
+    }
+
+    bootScreen.addEventListener("click", finishBoot);
+    window.addEventListener("keydown", finishBoot, { once: true });
+    runBootSequence();
   </script>
 </body>
 </html>
