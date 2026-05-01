@@ -120,14 +120,27 @@
     }
 
     .window {
-      border: 2px solid var(--soft);
+      --win-border: var(--soft);
+      --win-edge: #05020a;
+      --win-bg-a: rgba(255, 63, 188, 0.2);
+      --win-bg-b: rgba(66, 248, 255, 0.16);
+      --win-bg-solid: rgba(5, 2, 10, 0.74);
+      --win-glow-main: rgba(255, 63, 188, 0.42);
+      --win-glow-accent: rgba(66, 248, 255, 0.16);
+      --win-bar-a: var(--soft);
+      --win-bar-b: var(--cyan);
+      --win-bar-c: var(--violet);
+      --win-label: var(--lime);
+      --win-code: rgba(66, 248, 255, 0.8);
+      --win-plane-shadow: rgba(255, 63, 188, 0.5);
+      border: 2px solid var(--win-border);
       background:
-        linear-gradient(90deg, rgba(255, 63, 188, 0.2), rgba(66, 248, 255, 0.16)),
-        rgba(5, 2, 10, 0.74);
+        linear-gradient(90deg, var(--win-bg-a), var(--win-bg-b)),
+        var(--win-bg-solid);
       box-shadow:
-        0 0 0 3px #05020a,
-        0 0 2.2rem rgba(255, 63, 188, 0.42),
-        0 0 4rem rgba(66, 248, 255, 0.16);
+        0 0 0 3px var(--win-edge),
+        0 0 2.2rem var(--win-glow-main),
+        0 0 4rem var(--win-glow-accent);
       min-height: min(74vh, 43rem);
       display: grid;
       grid-template-rows: auto 1fr;
@@ -140,9 +153,9 @@
       justify-content: space-between;
       gap: 1rem;
       padding: 0 0.7rem;
-      border-bottom: 2px solid var(--soft);
+      border-bottom: 2px solid var(--win-border);
       color: #05020a;
-      background: linear-gradient(90deg, var(--soft), var(--cyan));
+      background: linear-gradient(90deg, var(--win-bar-a), var(--win-bar-b), var(--win-bar-c));
       font-size: 0.85rem;
       font-weight: 700;
       white-space: nowrap;
@@ -183,9 +196,9 @@
       position: absolute;
       left: 0.85rem;
       top: 0.75rem;
-      color: var(--lime);
+      color: var(--win-label);
       font-size: 0.85rem;
-      text-shadow: 0 0 0.7rem var(--lime);
+      text-shadow: 0 0 0.7rem var(--win-label);
     }
 
     .stage::after {
@@ -193,7 +206,7 @@
       position: absolute;
       right: 0.85rem;
       bottom: 0.75rem;
-      color: rgba(66, 248, 255, 0.8);
+      color: var(--win-code);
       font-size: 0.78rem;
     }
 
@@ -217,7 +230,7 @@
       inset: 0;
       display: grid;
       place-items: center;
-      filter: drop-shadow(0 0 0.75rem rgba(255, 63, 188, 0.5));
+      filter: drop-shadow(0 0 0.75rem var(--win-plane-shadow));
     }
 
     .ascii-output {
@@ -334,21 +347,73 @@
     }
 
     .hologram {
-      border-color: var(--cyan);
-      box-shadow:
-        0 0 0 3px #05020a,
-        0 0 2.4rem rgba(66, 248, 255, 0.48),
-        0 0 4.5rem rgba(139, 92, 255, 0.25);
+      --win-border: var(--cyan);
+      --win-bg-a: rgba(66, 248, 255, 0.18);
+      --win-bg-b: rgba(139, 92, 255, 0.16);
+      --win-glow-main: rgba(66, 248, 255, 0.48);
+      --win-glow-accent: rgba(139, 92, 255, 0.25);
+      --win-bar-a: var(--cyan);
+      --win-bar-b: var(--soft);
+      --win-bar-c: var(--violet);
+      --win-label: var(--cyan);
+      --win-code: rgba(255, 199, 241, 0.82);
+      --win-plane-shadow: rgba(66, 248, 255, 0.65);
     }
 
-    .hologram .bar {
-      background: linear-gradient(90deg, var(--cyan), var(--soft), var(--violet));
+    .window-flower {
+      --win-border: var(--pink);
+      --win-bg-a: rgba(255, 63, 188, 0.22);
+      --win-bg-b: rgba(119, 255, 106, 0.12);
+      --win-glow-main: rgba(255, 63, 188, 0.44);
+      --win-glow-accent: rgba(255, 230, 109, 0.18);
+      --win-bar-a: var(--soft);
+      --win-bar-b: var(--pink);
+      --win-bar-c: var(--yellow);
+      --win-label: var(--lime);
+      --win-code: rgba(255, 230, 109, 0.82);
+      --win-plane-shadow: rgba(255, 63, 188, 0.5);
     }
 
-    .hologram .plane {
-      filter:
-        drop-shadow(0 0 0.65rem rgba(66, 248, 255, 0.65))
-        drop-shadow(0 0 1.2rem rgba(255, 63, 188, 0.26));
+    .window-kitty {
+      --win-border: var(--cyan);
+      --win-bg-a: rgba(66, 248, 255, 0.18);
+      --win-bg-b: rgba(255, 199, 241, 0.14);
+      --win-glow-main: rgba(66, 248, 255, 0.48);
+      --win-glow-accent: rgba(255, 138, 226, 0.22);
+      --win-bar-a: var(--cyan);
+      --win-bar-b: var(--soft);
+      --win-bar-c: var(--violet);
+      --win-label: var(--cyan);
+      --win-code: rgba(255, 199, 241, 0.82);
+      --win-plane-shadow: rgba(66, 248, 255, 0.65);
+    }
+
+    .window-ladybug {
+      --win-border: var(--red);
+      --win-bg-a: rgba(255, 35, 72, 0.22);
+      --win-bg-b: rgba(119, 255, 106, 0.12);
+      --win-glow-main: rgba(255, 35, 72, 0.44);
+      --win-glow-accent: rgba(119, 255, 106, 0.2);
+      --win-bar-a: var(--red);
+      --win-bar-b: var(--yellow);
+      --win-bar-c: var(--lime);
+      --win-label: var(--yellow);
+      --win-code: rgba(119, 255, 106, 0.82);
+      --win-plane-shadow: rgba(255, 35, 72, 0.56);
+    }
+
+    .window-miata {
+      --win-border: var(--violet);
+      --win-bg-a: rgba(139, 92, 255, 0.2);
+      --win-bg-b: rgba(255, 138, 226, 0.16);
+      --win-glow-main: rgba(139, 92, 255, 0.42);
+      --win-glow-accent: rgba(255, 230, 109, 0.16);
+      --win-bar-a: var(--violet);
+      --win-bar-b: var(--pink);
+      --win-bar-c: var(--yellow);
+      --win-label: var(--soft);
+      --win-code: rgba(255, 230, 109, 0.82);
+      --win-plane-shadow: rgba(139, 92, 255, 0.52);
     }
 
     .ripple {
@@ -583,7 +648,7 @@
     </section>
 
     <section class="view" id="flowerView" aria-label="Rotating ANSI pixel flower animation">
-    <section class="window">
+    <section class="window window-flower">
       <div class="bar">
         <span>FLOWER_VIEWER.EXE</span>
         <span><i></i><i></i><i></i></span>
@@ -613,7 +678,7 @@
     </section>
 
     <section class="view" id="kittyView" aria-label="Rotating ANSI hologram Hello Kitty face" hidden>
-    <section class="window hologram">
+    <section class="window hologram window-kitty">
       <div class="bar">
         <span>HOLO_KITTY.EXE</span>
         <span><i></i><i></i><i></i></span>
@@ -639,7 +704,7 @@
     </section>
 
     <section class="view" id="ladybugView" aria-label="Rotating ANSI hologram ladybug" hidden>
-    <section class="window hologram">
+    <section class="window hologram window-ladybug">
       <div class="bar">
         <span>LADYBUG_VIEW.EXE</span>
         <span><i></i><i></i><i></i></span>
@@ -655,7 +720,7 @@
     </section>
 
     <section class="view" id="miataView" aria-label="Rotating ANSI hologram pink Miata" hidden>
-    <section class="window hologram">
+    <section class="window hologram window-miata">
       <div class="bar">
         <span>PINK_MIATA.EXE</span>
         <span><i></i><i></i><i></i></span>
@@ -726,28 +791,32 @@
         next: "kitty",
         button: "KITTY",
         title: "Pixel<br>Flower",
-        copy: "Pretty pink flower for my honey :3"
+        copy: "Pretty pink flower for my honey :3",
+        success: "FLOWER_VIEWER.EXE loaded. flower window active."
       },
       kitty: {
         node: kittyView,
         next: "ladybug",
         button: "LADYBUG",
         title: "Holo<br>Kitty",
-        copy: "Hehe HOLO kitty, get it? Like hologram hello kitty? :3"
+        copy: "Hehe HOLO kitty, get it? Like hologram hello kitty? :3",
+        success: "HOLO_KITTY.EXE online. kitty window active."
       },
       ladybug: {
         node: ladybugView,
         next: "miata",
         button: "MIATA",
         title: "Cutie<br>Ladybug",
-        copy: "A ladybug for my ladybug! :3"
+        copy: "A ladybug for my ladybug! :3",
+        success: "LADYBUG_VIEW.EXE loaded. ladybug window active."
       },
       miata: {
         node: miataView,
         next: "flower",
         button: "FLOWER",
         title: "Pink<br>Miata",
-        copy: "Cute pink Miata!!"
+        copy: "Cute pink Miata!!",
+        success: "PINK_MIATA.EXE ready. Miata window active."
       }
     };
     const cuteReplies = [
@@ -1267,31 +1336,38 @@
       addCliLine("SYSTEM: more: marriage/marry me, diet coke, bunny, bear", "reply help");
     }
 
-    function runMessageEffect(message) {
+    function getRequestedView(message) {
       const lower = message.toLowerCase();
-      let handled = false;
+      let requested = "";
 
       if (lower.includes("kitty") || lower.includes("cat")) {
-        setView("kitty");
-        sparkleActiveModel(0.42);
-        handled = true;
+        requested = "kitty";
       }
 
       if (lower.includes("bug") || lower.includes("ladybug")) {
-        setView("ladybug");
-        sparkleActiveModel(0.42);
-        handled = true;
+        requested = "ladybug";
       }
 
       if (lower.includes("miata") || lower.includes("car")) {
-        setView("miata");
-        sparkleActiveModel(0.42);
-        handled = true;
+        requested = "miata";
       }
 
       if (lower.includes("flower")) {
-        setView("flower");
+        requested = "flower";
+      }
+
+      return requested;
+    }
+
+    function runMessageEffect(message) {
+      const lower = message.toLowerCase();
+      let handled = false;
+      const requestedView = getRequestedView(message);
+
+      if (requestedView) {
+        setView(requestedView);
         sparkleActiveModel(0.42);
+        addCliLine(`SYSTEM: SUCCESS: ${views[requestedView].success}`, "reply");
         handled = true;
       }
 
